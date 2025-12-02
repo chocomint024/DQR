@@ -1,120 +1,370 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New電波人間のRPG FREE!お役立ちサイト</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://chocomint024.github.io/New_Denpa_FREE/IMG_0044.png" type="image/x-icon">
-    <link rel="manifest" href="manifest.json">
+    <title>電波人間用QRコード自動生成ツール</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #qrcode canvas {
+            width: 100% !important;
+            max-width: 400px;
+            height: auto !important;
+        }
+        #generatedString {
+            margin-top: 10px;
+            font-size: 18px;
+            word-wrap: break-word;
+        }
+        #saveButton {
+            margin-top: 10px;
+            display: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .description {
+            font-size: 12px;
+            color: gray;
+            margin-top: 10px;
+        }
+        .selectGroup {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .selectGroup div {
+            margin-right: 20px;
+            min-width: 120px;
+        }
+        @media (max-width: 600px) {
+            .selectGroup div {
+                margin-right: 0;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <img src="images/home.png" alt="サイトのヘッダー画像" class="header-image">
 
-    <div id="daily-event">
-    <img id="event-image" src="" alt="本日のイベント">
-</div>
+    <h2>電波人間用QRコード自動生成ツール</h2>
 
+    <input type="number" id="stringLength" placeholder="文字列の長さ (1-493)" min="1" max="493" value="126">
+    <button onclick="generateQRCode()">QRコードを生成</button>
+
+    <div class="description">※ランダムでQRを生成します。意図的なQRは作れません。</div>
+
+    <div id="qrcode"></div>
+    <div id="generatedString"></div>
+
+    <div id="qrCount">QRコード生成回数: 0</div>
+
+    <!-- 全セレクトボックス -->
+    <div class="selectGroup">
+        <div>
+            <strong>回避率</strong>
+            <select id="avoidanceSelect">
+                <option value="">選択してください</option>
+                <option value="回避0">回避0</option>
+                <option value="回避3+">回避3+</option>
+                <option value="回避3-">回避3-</option>
+                <option value="回避6">回避6</option>
+                <option value="回避10">回避10</option>
+                <option value="回避15">回避15</option>
+            </select>
+        </div>
+
+        <div>
+            <strong>体格</strong>
+            <select id="physiqueSelect">
+                <option value="">選択してください</option>
+                <option value="最速">最速</option>
+                <option value="準速">準速</option>
+                <option value="中間">中間</option>
+                <option value="準大">準大</option>
+                <option value="最大">最大</option>
+            </select>
+        </div>
+
+        <div>
+            <strong>色</strong>
+            <select id="colorSelect">
+                <option value="">選択してください</option>
+                <option value="黒">黒</option>
+                <option value="赤">赤</option>
+                <option value="青">青</option>
+                <option value="黄">黄</option>
+                <option value="橙">橙</option>
+                <option value="緑">緑</option>
+                <option value="水">水</option>
+                <option value="紫">紫</option>
+                <option value="白">白</option>
+                <option value="薄黒">薄黒</option>
+                <option value="薄赤">薄赤</option>
+                <option value="薄青">薄青</option>
+                <option value="薄黄">薄黄</option>
+                <option value="薄橙">薄橙</option>
+                <option value="薄緑">薄緑</option>
+                <option value="薄水">薄水</option>
+                <option value="薄紫">薄紫</option>
+                <option value="薄白">薄白</option>
+                <option value="濃黒">濃黒</option>
+                <option value="濃赤">濃赤</option>
+                <option value="濃青">濃青</option>
+                <option value="濃黄">濃黄</option>
+                <option value="濃橙">濃橙</option>
+                <option value="濃緑">濃緑</option>
+                <option value="濃水">濃水</option>
+                <option value="濃紫">濃紫</option>
+                <option value="濃白">濃白</option>
+            </select>
+        </div>
+
+        <div>
+            <strong>頭</strong>
+            <select id="headSelect">
+                <option value="">選択してください</option>
+                <option value="よこまる">よこまる</option>
+                <option value="かどまる">かどまる</option>
+                <option value="まる">まる</option>
+                <option value="さんかく">さんかく</option>
+                <option value="しかく">しかく</option>
+                <option value="たてまる">たてまる</option>
+            </select>
+        </div>
+
+        <div>
+            <strong>アンテナ</strong>
+            <select id="antennaSelect">
+                <option value="">選択してください</option>
+                <option value="アンテナなし">アンテナなし</option>
+                <option value="ふっかつ">ふっかつ</option>
+                <option value="かいふく">かいふく</option>
+                <option value="むてき">むてき</option>
+                <option value="よけにくい">よけにくい</option>
+                <option value="ノックダウン">ノックダウン</option>
+                <option value="なおす">なおす</option>
+                <option value="ぞくせいなおす">ぞくせいなおす</option>
+                <option value="こうふん">こうふん</option>
+                <option value="あしもとガード">あしもとガード</option>
+                <option value="おそくなれ">おそくなれ</option>
+                <option value="よわくなれ">よわくなれ</option>
+                <option value="やわくなれ">やわくなれ</option>
+                <option value="はやくなれ">はやくなれ</option>
+                <option value="つよくなれ">つよくなれ</option>
+                <option value="かたくなれ">かたくなれ</option>
+                <option value="かわしやすい">かわしやすい</option>
+                <option value="どくになれ">どくになれ</option>
+                <option value="めかくし">めかくし</option>
+                <option value="しびれさせる">しびれさせる</option>
+                <option value="ねむらせる">ねむらせる</option>
+                <option value="げどく">げどく</option>
+                <option value="しびれとる">しびれとる</option>
+                <option value="めざめる">めざめる</option>
+                <option value="単体火">単体火</option>
+                <option value="単体水">単体水</option>
+                <option value="単体電気">単体電気</option>
+                <option value="単体土">単体土</option>
+                <option value="単体風">単体風</option>
+                <option value="単体氷">単体氷</option>
+                <option value="単体闇">単体闇</option>
+                <option value="単体光">単体光</option>
+                <option value="3体火">3体火</option>
+                <option value="3体水">3体水</option>
+                <option value="3体電気">3体電気</option>
+                <option value="3体土">3体土</option>
+                <option value="3体風">3体風</option>
+                <option value="3体氷">3体氷</option>
+                <option value="3体闇">3体闇</option>
+                <option value="3体光">3体光</option>
+            </select>
+        </div>
+
+        <div>
+            <strong>特徴</strong>
+            <select id="featureSelect">
+                <option value="">選択してください</option>
+                <option value="親子">親子</option>
+                <option value="双子">双子</option>
+                <option value="顔素材">顔素材</option>
+                <option value="かわいい">かわいい</option>
+                <option value="かっこいい">かっこいい</option>
+                <option value="髪素材">髪素材</option>
+                <option value="眉素材">眉素材</option>
+                <option value="目素材">目素材</option>
+                <option value="鼻素材">鼻素材</option>
+                <option value="口素材">口素材</option>
+                <option value="頬素材">頬素材</option>
+                <option value="顔色素材">顔色素材</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- QR保存ボタン -->
+    <button id="saveButton" onclick="saveQRCode()">QRコード画像を保存</button>
+    <div class="description" id="saveDescription" style="display:none;">※選択肢を押さなくても保存できます。</div>
+
+    <!-- ボタン2つ -->
+    <button id="physiqueTableButton" style="margin-top:10px;" onclick="togglePhysiqueTable()">体格表を表示</button>
+    <button id="historyButton" style="margin-top:10px; margin-left:10px;" onclick="toggleHistory()">履歴を表示</button>
+
+    <!-- 履歴 -->
+    <div id="historyContainer" style="display:none; margin-top:15px;">
+        <h3>生成履歴</h3>
+        <div id="history" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;"></div>
+    </div>
+
+    <!-- 体格表 -->
+    <div id="physiqueTableContainer" style="display:none; margin-top:15px;">
+        <img id="physiqueTableImage"
+             src="https://github.com/chocomint024/DenpaQR/blob/main/%E4%BD%93%E6%A0%BC%E8%A1%A8.png?raw=true"
+             alt="体格表" style="max-width:100%; height:auto;">
+    </div>
 
 <script>
-    function updateEvent() {
-        // イベントごとの画像ファイル（画像は "images" フォルダ内に配置）
-        const eventImages = {
-            0: "images/event7.png",    // 日曜日
-            1: "images/event1.png",    // 月曜日
-            2: "images/event2.png",   // 火曜日
-            3: "images/event3.png", // 水曜日
-            4: "images/event4.png",  // 木曜日
-            5: "images/event5.png",    // 金曜日
-            6: "images/event6.png"   // 土曜日
-        };
+let qrCodeElement;
+let qrCodeCount = 0;
 
-        // 現在の日時を取得
-        const now = new Date();
-        let day = now.getDay(); // 今日の曜日を取得
-        let hours = now.getHours(); // 現在の時間を取得
-
-        // 15時（午後3時）より前なら、前日の日付のイベントを表示
-        if (hours < 15) {
-            day = (day - 1 + 7) % 7; // 前日に変更（日曜日なら土曜日に戻す）
-        }
-
-        // 画像を変更
-        document.getElementById("event-image").src = eventImages[day];
+// QR生成
+function generateQRCode() {
+    const maxLength = parseInt(document.getElementById("stringLength").value);
+    if (isNaN(maxLength) || maxLength < 1 || maxLength > 493) {
+        alert("1〜493 の範囲で入力してください。");
+        return;
     }
 
-    // 初回実行
-    updateEvent();
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomString = "";
+    for (let i = 0; i < maxLength; i++) {
+        randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
 
-    // 1分ごとに更新（ページを開いたままでも自動更新）
-    setInterval(updateEvent, 60000);
+    document.getElementById("qrcode").innerHTML = "";
+    qrCodeElement = document.createElement("div");
+    document.getElementById("qrcode").appendChild(qrCodeElement);
+
+    const size = 400;
+
+    new QRCode(qrCodeElement, {
+        text: randomString,
+        width: size,
+        height: size
+    });
+
+    const original = qrCodeElement.querySelector("canvas");
+    const bordered = document.createElement("canvas");
+
+    const border = 30;
+    bordered.width = size + border * 2;
+    bordered.height = size + border * 2;
+
+    const ctx = bordered.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, bordered.width, bordered.height);
+    ctx.drawImage(original, border, border, size, size);
+
+    qrCodeElement.innerHTML = "";
+    qrCodeElement.appendChild(bordered);
+
+    document.getElementById("generatedString").innerHTML = "生成した文字列: " + randomString;
+    document.getElementById("saveButton").style.display = "inline";
+    document.getElementById("saveDescription").style.display = "block";
+
+    resetSelects();
+
+    // ★★ 履歴追加（borderedを渡す）
+    addHistory(bordered.toDataURL("image/png"), randomString);
+
+    // ★★ カウンター更新
+    qrCodeCount++;
+    document.getElementById("qrCount").innerText = "QRコード生成回数: " + qrCodeCount;
+}
+
+// 選択肢リセット
+function resetSelects() {
+    document.getElementById("avoidanceSelect").selectedIndex = 0;
+    document.getElementById("physiqueSelect").selectedIndex = 0;
+    document.getElementById("colorSelect").selectedIndex = 0;
+    document.getElementById("headSelect").selectedIndex = 0;
+    document.getElementById("antennaSelect").selectedIndex = 0;
+    document.getElementById("featureSelect").selectedIndex = 0;
+}
+
+// 保存処理
+function saveQRCode() {
+    const canvas = qrCodeElement.querySelector("canvas");
+    if (!canvas) return;
+
+    const imgSrc = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+
+    const selected = [
+        avoidanceSelect.value,
+        physiqueSelect.value,
+        colorSelect.value,
+        headSelect.value,
+        antennaSelect.value,
+        featureSelect.value
+    ].filter(v => v).join("_");
+
+    link.download = selected ? `qrcode_${selected}.png` : "qrcode.png";
+    link.href = imgSrc;
+    link.click();
+}
+
+// 履歴追加
+function addHistory(imgSrc, text) {
+    const history = document.getElementById("history");
+
+    const box = document.createElement("div");
+    box.style.border = "1px solid #ccc";
+    box.style.padding = "5px";
+    box.style.background = "white";
+
+    const img = document.createElement("img");
+    img.src = imgSrc;
+    img.style.width = "100px";
+    img.style.cursor = "pointer";
+
+    img.onclick = () => {
+        const w = window.open("");
+        w.document.write(`<img src="${imgSrc}" style="width:400px;">`);
+        w.document.title = "QRコード拡大表示";
+    };
+
+    const label = document.createElement("div");
+    label.innerText = text;
+    label.style.fontSize = "10px";
+    label.style.wordBreak = "break-all";
+
+    box.appendChild(img);
+    box.appendChild(label);
+    history.appendChild(box);
+}
+
+// 履歴表示切換
+function toggleHistory() {
+    const c = document.getElementById("historyContainer");
+    c.style.display = c.style.display === "none" ? "block" : "none";
+    historyButton.innerText = c.style.display === "none" ? "履歴を表示" : "履歴を非表示";
+}
+
+// 体格表示切換
+function togglePhysiqueTable() {
+    const c = document.getElementById("physiqueTableContainer");
+    c.style.display = c.style.display === "none" ? "block" : "none";
+    physiqueTableButton.innerText = c.style.display === "none" ? "体格表を表示" : "体格表を非表示";
+}
+
 </script>
 
-
-
-
-        <nav>
-    <div class="grid-container">
-        <a href="https://chocomint024.github.io/QRkeizi/" target="_blank"><img src="images/ranboss.png" alt="ランボス攻略"></a>
-        <a href="https://chocomint024.github.io/QRkeizi/" target="_blank"><img src="images/iveste.png" alt="イベステ攻略"></a>
-        <a href="https://chocomint024.github.io/QRkeizi/" target="_blank"><img src="images/qr2.png" alt="QR共有掲示板"></a>
-        <a href="https://chocomint024.github.io/DenpaQR/" target="_blank"><img src="images/qr3.png" alt="QR生成"></a>
-    </div>
-</nav>
-
-<nav>
-    <ul class="vertical-list">
-        <li><a href="https://note.com/denpa_men/n/n8bdba80afd0b?sub_rt=share_pw" target="_blank">
-            <img src="images/ba.png" alt="バトルタワー攻略">
-        </a></li>
-        <li><a href="https://chocomint024.github.io/QRkeizi/">
-            <img src="images/taikaku.png" alt="体格表">
-        </a></li>
-        <li><a href="https://discord.gg/38FqVyRGAJ" target="_blank">
-            <img src="images/discord.png" alt="ディスコード鯖">
-        </a></li>
-        
-    </ul>
-</nav>
-
-        <div class="old-free-site">
-    <a href="https://takka0407.github.io/nanndemo/index.html" target="_blank">
-        <img src="images/kyufu.png" alt="旧FREEお役立ちサイト" class="hover-image">
-    </a>
-</div>
-         
-        </nav>
-<div class="twitter-account">
-    <p>作成者: <span>ちょこみんと</span></p>
-    <p>デザイン: <span>麺呂メ</span></p>
-    <br>
-    <a href="https://twitter.com/Denpa_men?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false"></a>
-    <a href="https://twitter.com/men_rome?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false"></a>
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</div>
-
-    <div class="download-buttons">
-        <a href="https://play.google.com/store/apps/details?id=jp.geniussonority.newdenpafree" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Playでダウンロード">
-        </a>
-        <a href="https://apps.apple.com/jp/app/new-%E9%9B%BB%E6%B3%A2%E4%BA%BA%E9%96%93%E3%81%AErpg-free/id6466145265" target="_blank">
-            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Storeでダウンロード">
-        </a>
-    </div>
-</div>
-
-
-
-
-<div class="twitter-timeline-container">
-    <a class="twitter-timeline" 
-       href="https://twitter.com/denpaningen?ref_src=twsrc%5Etfw" 
-       data-width="320" 
-       data-height="500" 
-       data-tweet-limit="5" 
-       data-theme="light"
-       data-chrome="noheader nofooter noborders">
-       Tweets by @denpaningen
-    </a>
-</div>
+</body>
+</html>
